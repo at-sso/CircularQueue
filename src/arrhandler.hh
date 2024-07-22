@@ -16,10 +16,14 @@ private:
 	// Initial value of buffer -> [ 0, ... ]
 	int32_t frontValue;
 	// Final value of buffer -> [ ..., 0 ]
-	int32_t finalValue; 
+	int32_t finalValue;
 	// Number of elements in the array.
 	int32_t arrCount;
+	// Debug status message.
 	string statusMsg = ":D";
+	// Shows the status of the `arrBuffer` if `true`. Only show `statusMsg` if `false`.
+	bool showBufferStatus = true;
+
 
 	/**!
 	 * @brief Formats and updates the status message of the queue.
@@ -35,23 +39,27 @@ private:
 		// Reserve space in the string to avoid multiple reallocations
 		this->statusMsg.reserve(100);
 
-		// Start with the base status message
-		this->statusMsg = "Queue status: [ ";
+		// Start the status message with an empty string
+		this->statusMsg = "";
 
-		for( int32_t j = 0, i = this->frontValue; j < this->arrCount; j++, i = ( i + 1 ) % _ARRAY_LIMIT ) {
-			this->statusMsg += to_string(this->arrBuffer[i]);
-			if( j < this->arrCount - 1 ) {
-				this->statusMsg += ", ";
+		// If false, only show `statusMsg + local s`.
+		if( showBufferStatus ) {
+			// Start with the base status message
+			this->statusMsg += "Queue status: [ ";
+
+			for( int32_t j = 0, i = this->frontValue; j < this->arrCount; j++, i = ( i + 1 ) % _ARRAY_LIMIT ) {
+				this->statusMsg += to_string(this->arrBuffer[i]);
+				if( j < this->arrCount - 1 )
+					this->statusMsg += ", ";
 			}
-		}
 
-		// If the queue is empty, add "empty" to the status message
-		if( this->isQEmpty() ) {
-			this->statusMsg += "empty";
+			// If the queue is empty, add "empty" to the status message
+			if( this->isQEmpty() )
+				this->statusMsg += "empty]\n";
 		}
 
 		// Close the status message and append the optional string
-		this->statusMsg += " ]\n" + s + "\n";
+		this->statusMsg += s + "\n";
 	}
 
 public:
@@ -79,7 +87,7 @@ public:
 		return this->arrCount == 0;
 	}
 
-	// Insert an element into the `arr`.
+	// Insert an element into the `arrBuffer`.
 	void insert(const int16_t element) noexcept {
 		if( this->isQFull() ) {
 			this->formatStatus("Insertion error: The queue is full.");
@@ -91,7 +99,7 @@ public:
 		this->formatStatus();
 	}
 
-	// Delete an element from the `arr`.
+	// Delete an element from the `arrBuffer`.
 	void del() noexcept {
 		if( isQEmpty() ) {
 			this->formatStatus("Deletion error: The queue is empty.");
@@ -99,6 +107,32 @@ public:
 		}
 		this->frontValue = ( this->frontValue + 1 ) % _ARRAY_LIMIT;
 		this->arrCount--;
+		this->formatStatus();
+	}
+
+	// Delete elements from the `arrBuffer` up to a specified point.
+	void del(const int16_t uPos) noexcept {
+		// Convert user position (1-based) to index (0-based)
+		int16_t index = uPos - 1;
+
+		if( isQEmpty() ) {
+			this->formatStatus("Deletion error: The queue is empty.");
+			return;
+		}
+
+		// Check if the deleteIndex is within the valid range
+		if( index < 0 || index >= this->arrCount ) {
+			this->formatStatus("Deletion error: Invalid position.");
+			return;
+		}
+
+		// Calculate the number of elements to delete
+		int16_t elementsToDelete = index + 1;
+
+		// Update frontValue and arrCount accordingly
+		this->frontValue = ( this->frontValue + elementsToDelete ) % _ARRAY_LIMIT;
+		this->arrCount -= elementsToDelete;
+
 		this->formatStatus();
 	}
 

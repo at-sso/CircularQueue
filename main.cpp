@@ -1,16 +1,19 @@
 #include "src/arrhandler.hh"
 #include <cstdint>
 #include <iostream>
+#include <malloc.h>
 #include <string>
 
 #define doShowExtraMessage showExtraMessage = true
 #define doNotShowExtraMessage showExtraMessage = false
 
+static constexpr uint64_t SIZE = 4096Ui64;
+
 using std::cout, std::cin;
 
 CircularQueue q;
 // In-menu message.
-char* extraMessage = (char[]) "";
+char* extraMessage = new char[SIZE];
 // Do you want an extra message? Maybe... I don't know, it's actually on you.
 static bool showExtraMessage;
 
@@ -20,7 +23,7 @@ int main() {
 	// Selected option in the main menu.
 	int16_t option = 0;
 	// Add null terminator at the end of the array.
-	extraMessage[256 - 1] = '\0';
+	extraMessage[SIZE - 1] = '\0';
 
 	do {
 		// "Clears" the screen. How? https://en.wikipedia.org/wiki/ANSI_escape_code
@@ -33,7 +36,7 @@ int main() {
 			"3. Help.\n"
 			"0. Exit.\n"
 			<< q.status()
-			<< ( showExtraMessage ? extraMessage : "" )
+			<< ( showExtraMessage ? extraMessage : "\n" )
 			<< "\n> " << flush;
 		cin >> option;
 
@@ -45,7 +48,7 @@ int main() {
 			extraMessage = ( char[] ) "\nInvalid option! Please try again.";
 			break;
 		case 0: // Exit option.
-			cout << "bye bye!" << endl;
+			cout << "Bye bye!" << endl;
 			break;
 		case -1: // Debug option (not shown in the menu).
 			doNotShowExtraMessage;
@@ -70,5 +73,6 @@ int main() {
 				"- Status Message : Provides a string representation of the queue's current state.";
 		}
 	} while( option != 0 );
+	free(extraMessage);
 	return 0;
 }
