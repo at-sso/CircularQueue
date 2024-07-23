@@ -1,19 +1,19 @@
 #include "src/arrhandler.hh"
 #include <cstdint>
 #include <iostream>
-#include <malloc.h>
 #include <string>
 
 #define doShowExtraMessage showExtraMessage = true
 #define doNotShowExtraMessage showExtraMessage = false
 
-static constexpr uint64_t SIZE = 4096Ui64;
+static constexpr uint64_t SIZE = 4096ull;
 
 using std::cout, std::cin;
+using std::string;
 
 CircularQueue q;
 // In-menu message.
-char* extraMessage = new char[SIZE];
+string extraMessage = "";
 // Do you want an extra message? Maybe... I don't know, it's actually on you.
 static bool showExtraMessage;
 
@@ -22,14 +22,12 @@ int main() {
 	int16_t element = 0;
 	// Selected option in the main menu.
 	int16_t option = 0;
-	// Add null terminator at the end of the array.
-	extraMessage[SIZE - 1] = '\0';
 
 	do {
 		// "Clears" the screen. How? https://en.wikipedia.org/wiki/ANSI_escape_code
 		cout << "\n\x1B[2J\x1B[H";
 
-		cout << ( char[] )
+		cout <<
 			"Choose an option.\n"
 			"1. Insert element.\n"
 			"2. Delete the first element.\n"
@@ -45,7 +43,7 @@ int main() {
 		switch( option ) {
 		default: // Invalid option.
 			doShowExtraMessage;
-			extraMessage = ( char[] ) "\nInvalid option! Please try again.";
+			extraMessage = "\nInvalid option! Please try again.";
 			break;
 		case 0: // Exit option.
 			cout << "Bye bye!" << endl;
@@ -66,13 +64,12 @@ int main() {
 			break;
 		case 3: // Help message.
 			doShowExtraMessage;
-			extraMessage = ( char[] )
+			extraMessage =
 				"- Initialization: Sets up an empty queue with 'frontValue', 'finalValue', and 'arrCount'.\n"
 				"- Insertion: Adds elements to the position indicated by 'finalValue', wraps around if needed, and increments 'arrCount'.\n"
 				"- Deletion : Removes elements from the position indicated by 'frontValue', wraps around if needed, and decrements 'arrCount'.\n"
 				"- Status Message : Provides a string representation of the queue's current state.";
 		}
 	} while( option != 0 );
-	free(extraMessage);
 	return 0;
 }

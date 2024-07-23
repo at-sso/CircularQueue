@@ -30,16 +30,10 @@ This project implements a circular queue (also known as a circular buffer or rin
 
 1. Clone the repository or download the source code.
 2. Open a terminal and navigate to the directory containing the source code.
-3. Compile the program using a C++ compiler:
+3. Compile and run the program using a C++ compiler:
 
    ```bash
-   g++ -o circular_queue circular_queue.cpp
-   ```
-
-4. Run the compiled program:
-
-   ```bash
-   ./circular_queue
+   g++ -std=c++20 -I src main.cpp -o main.exe && ./main
    ```
 
 ### Using the Program
@@ -57,7 +51,7 @@ Choose an option by entering the corresponding number and following the prompts.
 
 ### CircularQueue Class
 
-- `int arrQ[_LIMIT];`: Array to store the elements of the queue.
+- `int arrBuffer[_ARRAY_LIMIT];`: Array to store the elements of the queue.
 - `int frontValue;`: Index of the front of the queue.
 - `int finalValue;`: Index of the rear of the queue.
 - `int arrCount;`: Number of elements currently in the queue.

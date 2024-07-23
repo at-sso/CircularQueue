@@ -55,7 +55,9 @@ private:
 
 			// If the queue is empty, add "empty" to the status message
 			if( this->isQEmpty() )
-				this->statusMsg += "empty]\n";
+				this->statusMsg += "empty ]\n";
+			else
+				this->statusMsg += " ]\n";
 		}
 
 		// Close the status message and append the optional string
