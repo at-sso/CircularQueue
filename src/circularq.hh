@@ -1,3 +1,15 @@
+/**
+ * @file main.cpp
+ * @author Zperk
+ * @brief Circular Array implementation.
+ * @version 1.0.1
+ * @date 2024-07-23
+ *
+ * @copyright Copyright (c) zperk 2024
+ *
+ */
+
+
 #pragma once
 
 #include <cstdint>
@@ -10,19 +22,22 @@ using std::string, std::to_string;
 // A constant modulo limit.
 static constexpr int16_t _ARRAY_LIMIT = 8;
 
+/**
+ * @class CircularQueue
+ * @brief A circular queue implementation.
+ *
+ * This class implements a circular queue using a fixed-size array buffer. It provides
+ * methods to insert and delete elements, check if the queue is full or empty, and
+ * format a status message for debugging purposes.
+ */
 class CircularQueue {
 private:
-	int32_t arrBuffer[_ARRAY_LIMIT];
-	// Initial value of buffer -> [ 0, ... ]
-	int32_t frontValue;
-	// Final value of buffer -> [ ..., 0 ]
-	int32_t finalValue;
-	// Number of elements in the array.
-	int32_t arrCount;
-	// Debug status message.
-	string statusMsg = ":D";
-	// Shows the status of the `arrBuffer` if `true`. Only show `statusMsg` if `false`.
-	bool showBufferStatus = true;
+	int32_t arrBuffer[_ARRAY_LIMIT]; /// < The array buffer for the queue elements.
+	int32_t frontValue; /// < The index of the front element in the queue.
+	int32_t finalValue; /// < The index of the final element in the queue.
+	int32_t arrCount; /// < The number of elements in the queue.
+	string statusMsg = ""; /// < The status message for debugging.
+	bool showBufferStatus = true; /// < Flag to show the status of the array buffer.
 
 
 	/**!
@@ -61,10 +76,15 @@ private:
 		}
 
 		// Close the status message and append the optional string
-		this->statusMsg += s + "\n";
+		this->statusMsg += s;
 	}
 
 public:
+	/**
+	 * @brief Constructs a new CircularQueue object.
+	 *
+	 * Initializes the queue to be empty, with all buffer elements set to 0.
+	 */
 	CircularQueue() {
 		this->frontValue = 0;
 		this->finalValue = -1; // Don't use INT32_MAX
@@ -72,27 +92,55 @@ public:
 		for( int16_t i = 0; i < _ARRAY_LIMIT; i++ ) {
 			arrBuffer[i] = 0; // Initialize all elements of the `arrBuffer` array to 0
 		}
+		// Once everything is initialized, format the status message.
+		this->formatStatus();
 	}
 
-	// Get status message.
+	/**
+	 * @brief Gets the status message.
+	 *
+	 * @return The current status message.
+	 */
 	string status() const noexcept {
 		return this->statusMsg;
 	}
 
-	// Check if the `arrCount` value is equal to _LIMIT
+	/**
+	 * @brief Formats and updates the status message of the queue.
+	 *
+	 * This function updates the `statusMsg` member of the class to reflect the current state
+	 * of the queue. The status message is formatted to show all elements in the buffer queue.
+	 */
+	void updateStatus() noexcept {
+		this->formatStatus(); // This is kinda an overload...?
+	}
+
+	/**
+	 * @brief Checks if the queue is full.
+	 *
+	 * @return `true` if the queue is full, `false` otherwise.
+	 */
 	bool isQFull() const noexcept {
 		return this->arrCount == _ARRAY_LIMIT;
 	}
 
-	// Check if the `arrCount` value is equal to `0` (empty).
+	/**
+	 * @brief Checks if the queue is empty.
+	 *
+	 * @return `true` if the queue is empty, `false` otherwise.
+	 */
 	bool isQEmpty() const noexcept {
 		return this->arrCount == 0;
 	}
 
-	// Insert an element into the `arrBuffer`.
+	/**
+	 * @brief Inserts an element into the queue.
+	 *
+	 * @param element The element to insert.
+	 */
 	void insert(const int16_t element) noexcept {
 		if( this->isQFull() ) {
-			this->formatStatus("Insertion error: The queue is full.");
+			this->formatStatus("Insertion error: The queue is full.\n");
 			return;
 		}
 		this->finalValue = ( this->finalValue + 1 ) % _ARRAY_LIMIT;
@@ -101,10 +149,12 @@ public:
 		this->formatStatus();
 	}
 
-	// Delete an element from the `arrBuffer`.
+	/**
+	 * @brief Deletes the front element from the queue.
+	 */
 	void del() noexcept {
 		if( isQEmpty() ) {
-			this->formatStatus("Deletion error: The queue is empty.");
+			this->formatStatus("Deletion error: The queue is empty.\n");
 			return;
 		}
 		this->frontValue = ( this->frontValue + 1 ) % _ARRAY_LIMIT;
@@ -112,19 +162,23 @@ public:
 		this->formatStatus();
 	}
 
-	// Delete elements from the `arrBuffer` up to a specified point.
+	/**
+	 * @brief Deletes elements from the queue up to a specified position.
+	 *
+	 * @param uPos The position up to which elements should be deleted (1-based index).
+	 */
 	void del(const int16_t uPos) noexcept {
-		// Convert user position (1-based) to index (0-based)
+		// Convert user position (1-based) to index (0-based).
 		int16_t index = uPos - 1;
 
 		if( isQEmpty() ) {
-			this->formatStatus("Deletion error: The queue is empty.");
+			this->formatStatus("Deletion error: The queue is empty.\n");
 			return;
 		}
 
-		// Check if the deleteIndex is within the valid range
+		// Check if the deleteIndex is within the valid range.
 		if( index < 0 || index >= this->arrCount ) {
-			this->formatStatus("Deletion error: Invalid position.");
+			this->formatStatus("Deletion error: Invalid position.\n");
 			return;
 		}
 
@@ -138,13 +192,19 @@ public:
 		this->formatStatus();
 	}
 
-	// Format debug message.
+	/**
+	 * @brief Formats and prints a debug message.
+	 *
+	 * If the queue is empty, a specific error message is shown. Otherwise,
+	 * it prints the indices of the front and final elements.
+	 */
 	void debug() noexcept {
 		if( isQEmpty() ) {
-			this->formatStatus("Debug error: The arrCount is zero.");
+			this->formatStatus("Debug error: The arrCount is zero.\n");
 			return;
 		}
 		this->formatStatus(
+			"\nNOTE: These are the actual indexes."
 			"\nfrontValue: " + to_string(this->frontValue) +
 			"\nfinalValue: " + to_string(this->finalValue) + "\n"
 		);
